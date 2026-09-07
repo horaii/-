@@ -12,7 +12,7 @@
             welcomeMsg.textContent = `${userName}님 환영합니다! 🎉`;
         } else {
             alert('로그인이 필요한 페이지입니다.');
-            window.location.href = 'login.html';
+            window.location.href = '로그인.html';
         }
 
         const TARGET_LAT = 37.545864; 
