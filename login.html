@@ -31,6 +31,12 @@
             </button>
         </form>
 
+        <!-- 회원가입 페이지로 이동하는 링크 추가 -->
+        <p class="mt-4 text-center text-sm text-gray-600">
+            계정이 없으신가요? 
+            <a href="signup.html" class="text-indigo-600 font-medium hover:underline">회원가입</a>
+        </p>
+
         <p id="message" class="mt-4 text-center text-sm"></p>
     </div>
 
@@ -64,8 +70,7 @@
                 // 일치하는 계정이 존재할 경우 (로그인 성공)
                 const loggedInUser = data[0]; // Supabase에서 조회된 사용자 정보
                 
-                // ★ 핵심: 브라우저에 사용자 이름 저장
-                localStorage.setItem('userName', loggedInUser.name);
+                // 브라우저에 사용자 정보 저장
                 localStorage.setItem('userName', loggedInUser.name);
                 localStorage.setItem('userEmail', loggedInUser.email);
 
