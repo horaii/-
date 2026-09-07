@@ -16,7 +16,7 @@ if (userName) {
 
 const TARGET_LAT = 37.542289; 
 const TARGET_LNG = 127.209865; 
-const ALLOWED_RADIUS = 50; // 실제 운영을 위해 허용 반경을 50미터로 원복
+const ALLOWED_RADIUS = 2000; // 실제 운영을 위해 허용 반경을 50미터로 원복
 
 const btn = document.getElementById('checkInBtn');
 const statusDiv = document.getElementById('status');
