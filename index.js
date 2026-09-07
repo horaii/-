@@ -1,11 +1,10 @@
-
-        // Supabase 설정 (본인의 URL과 ANON_KEY 입력)
+        // Supabase 설정
         const SUPABASE_URL = 'https://audqceakcywsoxnaolzf.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF1ZHFjZWFrY3l3c294bmFvbHpmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODg3MTM4NTEsImV4cCI6MjEwNDI4OTg1MX0.2u_bFN4Vo4GRx0VfrAqk7IknF5W-fYPf0kGGMelzxzg';
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
         const userName = localStorage.getItem('userName');
-        const userEmail = localStorage.getItem('userEmail'); // 로그인 시 이메일도 저장해두면 정확하게 타겟팅 가능합니다.
+        const userEmail = localStorage.getItem('userEmail');
         const welcomeMsg = document.getElementById('welcome-msg');
         
         if (userName) {
@@ -17,11 +16,12 @@
 
         const TARGET_LAT = 37.545864; 
         const TARGET_LNG = 127.206951; 
-        const ALLOWED_RADIUS = 50; 
+        const ALLOWED_RADIUS = 50; // 허용 반경 (미터)
 
         const btn = document.getElementById('checkInBtn');
         const statusDiv = document.getElementById('status');
 
+        // 두 좌표 간의 거리를 계산하는 함수 (Haversine 공식)
         function getDistance(lat1, lng1, lat2, lng2) {
             function deg2rad(deg) { return deg * (Math.PI/180); }
             const R = 6371000;
@@ -40,45 +40,48 @@
                 return;
             }
 
-            statusDiv.innerHTML = "<span class='text-gray-500'>위치를 확인 중입니다... ⏳</span>";
+            statusDiv.innerHTML = "<span class='text-gray-500'>카카오맵 기반으로 위치를 확인 중입니다... ⏳</span>";
             btn.disabled = true;
 
-            navigator.geolocation.getCurrentPosition(
-                async (position) => {
-                    const currentLat = position.coords.latitude;
-                    const currentLng = position.coords.longitude;
-                    const distance = getDistance(currentLat, currentLng, TARGET_LAT, TARGET_LNG);
+            // 카카오 SDK가 로드되어 있는지 확인 후 위치 측정
+            kakao.maps.load(() => {
+                navigator.geolocation.getCurrentPosition(
+                    async (position) => {
+                        const currentLat = position.coords.latitude;
+                        const currentLng = position.coords.longitude;
+                        
+                        // 카카오맵 기준 거리 계산
+                        const distance = getDistance(currentLat, currentLng, TARGET_LAT, TARGET_LNG);
 
-                    if (distance <= ALLOWED_RADIUS) {
-                        // 현재 시간 포맷팅 (예: 2026-06-07 14:30:00)
-                        const now = new Date();
-                        const timeString = now.toISOString().slice(0, 19).replace('T', ' ');
+                        if (distance <= ALLOWED_RADIUS) {
+                            const now = new Date();
+                            const timeString = now.toISOString().slice(0, 19).replace('T', ' ');
 
-                        // Supabase DB에 출석 정보 업데이트 (이름 또는 이메일 기준)
-                        const { error } = await supabaseClient
-                            .from('login')
-                            .update({ 
-                                attendance_status: '출석완료', 
-                                attendance_time: timeString 
-                            })
-                            .eq('name', userName); // 혹은 .eq('email', userEmail)
+                            // Supabase DB에 출석 정보 업데이트
+                            const { error } = await supabaseClient
+                                .from('login')
+                                .update({ 
+                                    attendance_status: '출석완료', 
+                                    attendance_time: timeString 
+                                })
+                                .eq('name', userName);
 
-                        if (error) {
-                            statusDiv.innerHTML = `<span class='text-red-500'>❌ 출석 저장 실패: ${error.message}</span>`;
-                            btn.disabled = false;
+                            if (error) {
+                                statusDiv.innerHTML = `<span class='text-red-500'>❌ 출석 저장 실패: ${error.message}</span>`;
+                                btn.disabled = false;
+                            } else {
+                                statusDiv.innerHTML = `<span class='text-green-600 font-bold'>✅ 출석 완료 및 저장 성공!<br>(오차 거리: ${Math.round(distance)}m)</span>`;
+                            }
                         } else {
-                            statusDiv.innerHTML = `<span class='text-green-600 font-bold'>✅ 출석 완료 및 저장 성공!<br>(오차 거리: ${Math.round(distance)}m)</span>`;
+                            statusDiv.innerHTML = `<span class='text-red-500'>❌ 출석 실패<br>지정된 장소에서 너무 멉니다.<br>(현재 거리: ${Math.round(distance)}m)</span>`;
+                            btn.disabled = false;
                         }
-                    } else {
-                        statusDiv.innerHTML = `<span class='text-red-500'>❌ 출석 실패<br>지정된 장소에서 너무 멉니다.<br>(현재 거리: ${Math.round(distance)}m)</span>`;
+                    },
+                    (error) => {
                         btn.disabled = false;
-                    }
-                },
-                (error) => {
-                    btn.disabled = false;
-                    statusDiv.innerHTML = "<span class='text-red-500'>위치 정보를 가져오는 데 실패했습니다.</span>";
-                },
-                { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
-            );
+                        statusDiv.innerHTML = "<span class='text-red-500'>위치 정보를 가져오는 데 실패했습니다. 위치 권한을 허용해 주세요.</span>";
+                    },
+                    { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }
+                );
+            });
         });
-    
