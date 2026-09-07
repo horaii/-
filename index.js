@@ -53,14 +53,28 @@ btn.addEventListener('click', () => {
             const distance = getDistance(currentLat, currentLng, TARGET_LAT, TARGET_LNG);
 
             if (distance <= ALLOWED_RADIUS) {
-                const now = new Date();
-                const timeString = now.toISOString().slice(0, 19).replace('T', ' ');
+                const now = new Date();// 수정 전
+                // const timeString = now.toISOString().slice(0, 19).replace('T', ' ');
+
+                // 수정 후 (보기 좋은 날짜/시간 문자열로 변환)
+                const year = now.getFullYear();
+                const month = String(now.getMonth() + 1).padStart(2, '0');
+                const day = String(now.getDate()).padStart(2, '0');
+                const hours = String(now.getHours()).padStart(2, '0');
+                const minutes = String(now.getMinutes()).padStart(2, '0');
+                const seconds = String(now.getSeconds()).padStart(2, '0');
+
+                // 예: "2026-09-07 16:15:41" 형식
+                const timeString = `${year}년 ${month}월 ${day}일 ${hours}:${minutes}:${seconds}`;
+
+                // 혹은 한글 포함 형식으로 저장하고 싶다면:
+                // const timeString = `${year}년 ${month}월 ${day}일 ${hours}:${minutes}:${seconds}`;
 
                 // Supabase DB에 출석 정보 업데이트
                 const { error } = await supabaseClient
                     .from('login')
                     .update({ 
-                        attendance_status: '출석완료', 
+                        attendance_status: '출석완료',  
                         attendance_time: timeString 
                     })
                     .eq('name', userName);
