@@ -16,7 +16,7 @@ if (userName) {
 
 const TARGET_LAT = 37.542289; 
 const TARGET_LNG = 127.209865; 
-const ALLOWED_RADIUS = 100; // 허용 반경 (미터)
+const ALLOWED_RADIUS = 600; // 허용 반경 (미터)
 
 const btn = document.getElementById('checkInBtn');
 const statusDiv = document.getElementById('status');
