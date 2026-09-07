@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>하남점 출석체크 어플</title>
+    <link rel="stylesheet" href="index.css">
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <!-- Supabase JS Client CDN 추가 -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body class="bg-gray-50 flex items-center justify-center min-h-screen">
+
+    <div class="container bg-white p-8 rounded-xl shadow-md w-full max-w-md text-center">
+        <p id="welcome-msg" class="text-indigo-600 font-semibold mb-2"></p>
+        
+        <h1 class="text-2xl font-bold mb-4">출석체크</h1>
+        <p class="text-gray-600 mb-6">하남점 반경 50m 이내에서만<br>출석이 인정됩니다.</p>
+        
+        <button id="checkInBtn" class="w-full bg-indigo-600 text-white py-3 rounded-lg hover:bg-indigo-700 transition font-medium mb-4">
+            출석하기
+        </button>
+        
+        <!-- 출석 현황 페이지로 이동하는 버튼 추가 -->
+        <a href="출석확인.html" class="block w-full bg-gray-200 text-gray-700 py-2 rounded-lg hover:bg-gray-300 transition font-medium text-sm mb-4">
+            📊 출석 현황 보기
+        </a>
+
+        <div id="status" class="text-sm"></div>
+    </div>
+    
+    <script src="위치계산.js"></script>
+</body>
+</html>
