@@ -16,7 +16,7 @@ if (userName) {
 
 const TARGET_LAT = 37.542289; 
 const TARGET_LNG = 127.209865; 
-const ALLOWED_RADIUS = 10000; // 허용 반경 (미터)
+const ALLOWED_RADIUS = 50; // 실제 운영을 위해 허용 반경을 50미터로 원복
 
 const btn = document.getElementById('checkInBtn');
 const statusDiv = document.getElementById('status');
@@ -43,7 +43,6 @@ btn.addEventListener('click', () => {
     statusDiv.innerHTML = "<span class='text-gray-500'>위치 정보를 확인 중입니다... ⏳</span>";
     btn.disabled = true;
 
-    // 카카오맵 SDK 의존성을 제거하고 순수 브라우저 GPS로 즉시 측정하여 멈춤 현상 원천 차단
     navigator.geolocation.getCurrentPosition(
         async (position) => {
             const currentLat = position.coords.latitude;
@@ -61,6 +60,7 @@ btn.addEventListener('click', () => {
                 const minutes = String(now.getMinutes()).padStart(2, '0');
                 const seconds = String(now.getSeconds()).padStart(2, '0');
 
+                // 변수명을 formattedTime으로 통일
                 const formattedTime = `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
 
                 // Supabase DB에 출석 정보 업데이트
@@ -68,7 +68,7 @@ btn.addEventListener('click', () => {
                     .from('login')
                     .update({ 
                         attendance_status: '출석완료',  
-                        attendance_time: timeString 
+                        attendance_time: formattedTime 
                     })
                     .eq('name', userName);
 
