@@ -14,8 +14,8 @@ if (userName) {
     window.location.href = 'login.html';
 }
 
-const TARGET_LAT = 37.545805; 
-const TARGET_LNG = 127.207123; 
+const TARGET_LAT = 37.542289; 
+const TARGET_LNG = 127.209865; 
 const ALLOWED_RADIUS = 100; // 허용 반경 (미터)
 
 const btn = document.getElementById('checkInBtn');
